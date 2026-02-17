@@ -84,7 +84,8 @@ def load_data(file):
         df["Headache_Detail"] = df["Headache"].fillna("None")
         df["Headache"] = df["Headache"].apply(
             lambda x: False if str(x).strip().upper() in ["N", "NONE", "", "NAN", "NO"] else True
-        )    def categorize_exercise(ex):
+        )
+    def categorize_exercise(ex):
         if pd.isna(ex): return "No Data"
         ex_lower = str(ex).lower()
         if "rest" in ex_lower: return "Rest"
@@ -113,7 +114,8 @@ min_date = df["Date"].min().date()
 max_date = df["Date"].max().date()
 date_range = st.sidebar.date_input("Filter dates", value=(min_date, max_date), min_value=min_date, max_value=max_date)
 if len(date_range) == 2:
-    df = df[(df["Date"].dt.date >= date_range[0]) & (df["Date"].dt.date <= date_range[1])]st.sidebar.markdown(f"**{len(df)} days** of data loaded")
+    df = df[(df["Date"].dt.date >= date_range[0]) & (df["Date"].dt.date <= date_range[1])]
+st.sidebar.markdown(f"**{len(df)} days** of data loaded")
 
 # -- OVERVIEW --
 st.markdown("# 📊 Overview")
@@ -273,7 +275,8 @@ if "Headache" in df.columns:
     fig_ha_time = go.Figure()
     fig_ha_time.add_trace(go.Scatter(x=df["Date"], y=df["Headache"].astype(int), mode="markers+lines",
         marker=dict(size=12, color=["#f5576c" if h else "#e0e0e0" for h in df["Headache"]]),
-        line=dict(color="#e0e0e0", width=1)))    fig_ha_time.update_layout(height=200, template="plotly_white",
+        line=dict(color="#e0e0e0", width=1)))
+    fig_ha_time.update_layout(height=200, template="plotly_white",
         title=dict(text="Headache Timeline", font=dict(size=14)),
         yaxis=dict(tickvals=[0, 1], ticktext=["No", "Yes"]), margin=dict(t=40, b=30))
     st.plotly_chart(fig_ha_time, use_container_width=True)
@@ -325,7 +328,8 @@ st.markdown('<div class="section-header">📝 Symptoms & Notes Log</div>', unsaf
 symptoms_df = df[df["Symptoms"].notna() & (df["Symptoms"] != "None")][["Date", "Symptoms", "Notes"]].copy()
 if len(symptoms_df) > 0:
     symptoms_df["Date"] = symptoms_df["Date"].dt.strftime("%b %d, %Y")
-    st.dataframe(symptoms_df, use_container_width=True, hide_index=True)else:
+    st.dataframe(symptoms_df, use_container_width=True, hide_index=True)
+else:
     st.info("No symptoms logged in this period.")
 
 # -- Footer --
