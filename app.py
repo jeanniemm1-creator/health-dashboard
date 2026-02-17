@@ -24,7 +24,8 @@ def check_password():
     st.markdown("## 🔒 Jeannie's Health Dashboard")
     st.markdown("Enter your password to continue.")
     password = st.text_input("Password", type="password", key="pw_input")
-    if st.button("Sign In"):        if password == st.secrets.get("password", "jeannie2026"):
+    if st.button("Sign In"):
+        if password == st.secrets.get("password", "jeannie2026"):
             st.session_state.authenticated = True
             st.rerun()
         else:
