@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 import numpy as np
+import os
 
 # -- Page Config --
 st.set_page_config(
@@ -102,13 +103,33 @@ def load_data(file):
 # -- Sidebar --
 st.sidebar.markdown("# 💪 Health Dashboard")
 st.sidebar.markdown("---")
-uploaded_file = st.sidebar.file_uploader("Upload Health Tracker (.xlsx)", type=["xlsx"])
-if uploaded_file is None:
-    st.markdown("## Welcome, Jeannie!")
-    st.markdown("Upload your **health_tracker.xlsx** file using the sidebar to see your dashboard.")
-    st.code("OneDrive > Documents > Health > Fitness > health_tracker.xlsx")
-    st.stop()
-df = load_data(uploaded_file)
+
+DEFAULT_FILE = os.path.expanduser(
+    "~/Library/CloudStorage/OneDrive-Personal/Documents/Health/Fitness/health_tracker.xlsx"
+)
+
+uploaded_file = st.sidebar.file_uploader("Upload a different tracker (.xlsx)", type=["xlsx"])
+
+if uploaded_file is not None:
+    df = load_data(uploaded_file)
+elif os.path.exists(DEFAULT_FILE):
+    df = load_data(DEFAULT_FILE)
+else:
+    # Running on Streamlit Cloud — download from OneDrive
+    onedrive_url = st.secrets.get("onedrive_url", None)
+    if onedrive_url:
+        try:
+            import requests, io
+            response = requests.get(onedrive_url, timeout=15)
+            response.raise_for_status()
+            df = load_data(io.BytesIO(response.content))
+        except Exception as e:
+            st.error(f"Could not load data from OneDrive: {e}")
+            st.stop()
+    else:
+        st.markdown("## Welcome, Jeannie!")
+        st.markdown("Your health tracker file wasn't found.")
+        st.stop()
 st.sidebar.markdown("### Date Range")
 min_date = df["Date"].min().date()
 max_date = df["Date"].max().date()
